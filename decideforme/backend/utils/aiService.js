@@ -1,20 +1,11 @@
-/**
- * AI Service
- * Core AI decision engine using an OpenAI-compatible LLM API
- * Handles prompt engineering and response parsing
- */
 
 const OpenAI = require('openai');
 
-// Configure a generic OpenAI-compatible client (works with providers like OpenRouter)
 const openai = new OpenAI({
   apiKey: process.env.LLM_API_KEY,
   baseURL: process.env.LLM_API_BASE_URL || 'https://openrouter.ai/api/v1'
 });
 
-/**
- * Build a rich system prompt with user context
- */
 function buildSystemPrompt(user, preferences) {
   const profile = user.profile || {};
   const learnedPatterns = preferences?.learnedPatterns?.slice(-5) || [];
@@ -56,9 +47,6 @@ You MUST respond in valid JSON only, no markdown:
 }`;
 }
 
-/**
- * Build the user message for the AI
- */
 function buildUserMessage(decision) {
   const { title, category, options, context } = decision;
   const optionsList = options.map((o, i) => `${i + 1}. ${o.text}`).join('\n');
@@ -96,13 +84,12 @@ async function makeAIDecision(decision, user, preferences) {
 
   try {
     const response = await openai.chat.completions.create({
-      // Default model is an OpenAI-compatible, fast model via providers like OpenRouter
       model: process.env.LLM_MODEL || 'openai/gpt-4o-mini',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userMessage }
       ],
-      temperature: 0.4, // Some creativity but mostly consistent
+      temperature: 0.4, 
       max_tokens: 400,
       response_format: { type: 'json_object' }
     });
@@ -110,10 +97,8 @@ async function makeAIDecision(decision, user, preferences) {
     const rawContent = response.choices[0].message.content;
     const result = JSON.parse(rawContent);
 
-    // Validate the chosen option exists in the original options
     const validOptions = decision.options.map(o => o.text);
     if (!validOptions.includes(result.chosen)) {
-      // Find closest match
       result.chosen = validOptions[0];
       result.reason = result.reason || 'Selected based on your profile and context.';
     }
@@ -130,10 +115,7 @@ async function makeAIDecision(decision, user, preferences) {
   }
 }
 
-/**
- * Learn patterns from a completed decision with feedback
- * Updates the preferences.learnedPatterns array
- */
+
 async function learnFromDecision(decision, preferences) {
   if (!preferences || !decision.feedback) return;
 
@@ -160,7 +142,6 @@ async function learnFromDecision(decision, preferences) {
 
     const learned = JSON.parse(response.choices[0].message.content);
 
-    // Check if similar pattern exists
     const existingIdx = preferences.learnedPatterns?.findIndex(
       p => p.pattern.toLowerCase().includes(learned.pattern.toLowerCase().split(' ')[0])
     );
@@ -178,7 +159,6 @@ async function learnFromDecision(decision, preferences) {
         lastUpdated: new Date()
       });
 
-      // Keep max 20 patterns
       if (preferences.learnedPatterns.length > 20) {
         preferences.learnedPatterns = preferences.learnedPatterns.slice(-20);
       }
@@ -186,7 +166,6 @@ async function learnFromDecision(decision, preferences) {
 
     await preferences.save();
   } catch (err) {
-    // Non-critical, don't throw
     console.error('Pattern learning error:', err.message);
   }
 }

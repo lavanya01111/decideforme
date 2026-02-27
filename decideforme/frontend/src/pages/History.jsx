@@ -1,7 +1,4 @@
-/**
- * History Page
- * Browse all past decisions with filters
- */
+
 
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'

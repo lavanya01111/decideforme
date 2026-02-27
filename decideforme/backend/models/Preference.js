@@ -1,7 +1,4 @@
-/**
- * Preferences Model
- * Stores learned user preferences per category for AI context
- */
+
 
 const mongoose = require('mongoose');
 
@@ -13,7 +10,7 @@ const preferenceSchema = new mongoose.Schema({
     unique: true
   },
 
-  // Food preferences
+
   food: {
     favoriteCuisines: [String],
     dislikedFoods: [String],
@@ -23,41 +20,40 @@ const preferenceSchema = new mongoose.Schema({
     preferHomeCooked: Boolean
   },
 
-  // Outfit preferences
+
   outfit: {
-    style: [String],          // ['casual', 'formal', 'sporty']
+    style: [String],         
     favoriteColors: [String],
     dislikedColors: [String],
-    occasionTypes: [String]   // ['work', 'gym', 'date', 'home']
+    occasionTypes: [String]   
   },
 
-  // Task/productivity preferences
+  
   task: {
-    workStyle: String,         // 'pomodoro', 'deep-work', 'flexible'
-    peakHours: [String],       // ['morning', 'evening']
-    defaultPriority: String,   // 'urgency', 'importance', 'ease'
+    workStyle: String,         
+    peakHours: [String],      
+    defaultPriority: String,   
     breakFrequency: String
   },
 
-  // Entertainment preferences
+  
   entertainment: {
     favoriteGenres: [String],
-    platforms: [String],       // ['netflix', 'spotify', 'youtube']
+    platforms: [String],       
     maxDuration: String,
     mood: [String]
   },
 
-  // General AI learning memory
-  // Stores patterns detected across all categories
+
   learnedPatterns: [{
-    pattern: String,           // e.g. "Prefers lighter meals when mood is tired"
+    pattern: String,           
     category: String,
     confidence: Number,
     observedCount: Number,
     lastUpdated: Date
   }],
 
-  // Recent choices for context window
+
   recentChoices: [{
     category: String,
     chosen: String,

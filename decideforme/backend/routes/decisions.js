@@ -1,11 +1,3 @@
-/**
- * Decisions Routes
- * POST /api/decisions          - Create + get AI decision
- * GET  /api/decisions          - History (paginated)
- * GET  /api/decisions/:id      - Single decision
- * PUT  /api/decisions/:id/feedback - Submit feedback
- * DELETE /api/decisions/:id    - Soft delete
- */
 
 const express = require('express');
 const router = express.Router();
@@ -17,7 +9,6 @@ const User = require('../models/User');
 const { authenticate } = require('../middleware/auth');
 const { makeAIDecision, learnFromDecision } = require('../utils/aiService');
 
-// ─── Create Decision (Main AI endpoint) ──────────────────────────────────────
 router.post('/', authenticate, [
   body('title').trim().isLength({ min: 3, max: 200 }),
   body('category').isIn(['food', 'outfit', 'task', 'entertainment', 'custom']),
@@ -33,11 +24,9 @@ router.post('/', authenticate, [
       title, category, customCategory, options, context, mode, timerSeconds
     } = req.body;
 
-    // Add time of day automatically
     const hour = new Date().getHours();
     const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : hour < 21 ? 'evening' : 'night';
 
-    // Create decision document
     const decision = new Decision({
       user: req.user._id,
       title,
@@ -49,10 +38,8 @@ router.post('/', authenticate, [
       timerSeconds
     });
 
-    // Fetch user preferences for AI context
     const preferences = await Preference.findOne({ user: req.user._id });
 
-    // Call AI
     const startTime = Date.now();
     const aiResult = await makeAIDecision(decision, req.user, preferences);
 
@@ -60,7 +47,6 @@ router.post('/', authenticate, [
     decision.processingTimeMs = Date.now() - startTime;
     await decision.save();
 
-    // Update analytics and user stats async (don't await)
     updateAnalytics(req.user._id, category).catch(console.error);
     updateRecentChoices(preferences, category, aiResult.chosen, context).catch(console.error);
 
@@ -74,7 +60,6 @@ router.post('/', authenticate, [
   }
 });
 
-// ─── Get Decision History ─────────────────────────────────────────────────────
 router.get('/', authenticate, [
   query('page').optional().isInt({ min: 1 }),
   query('limit').optional().isInt({ min: 1, max: 50 }),
@@ -111,7 +96,6 @@ router.get('/', authenticate, [
   }
 });
 
-// ─── Get Single Decision ──────────────────────────────────────────────────────
 router.get('/:id', authenticate, async (req, res, next) => {
   try {
     const decision = await Decision.findOne({
@@ -130,7 +114,6 @@ router.get('/:id', authenticate, async (req, res, next) => {
   }
 });
 
-// ─── Submit Feedback ──────────────────────────────────────────────────────────
 router.put('/:id/feedback', authenticate, [
   body('rating').optional().isInt({ min: 1, max: 5 }),
   body('followed').optional().isBoolean()
@@ -146,11 +129,9 @@ router.put('/:id/feedback', authenticate, [
 
     if (!decision) return res.status(404).json({ error: 'Decision not found.' });
 
-    // Trigger learning from this feedback
     const preferences = await Preference.findOne({ user: req.user._id });
     learnFromDecision(decision, preferences).catch(console.error);
 
-    // Update analytics
     if (typeof followed === 'boolean') {
       const update = followed
         ? { $inc: { decisionsFollowed: 1 } }
@@ -164,7 +145,6 @@ router.put('/:id/feedback', authenticate, [
   }
 });
 
-// ─── Delete Decision ──────────────────────────────────────────────────────────
 router.delete('/:id', authenticate, async (req, res, next) => {
   try {
     await Decision.findOneAndUpdate(
@@ -177,7 +157,6 @@ router.delete('/:id', authenticate, async (req, res, next) => {
   }
 });
 
-// ─── Helper: Update Analytics ─────────────────────────────────────────────────
 async function updateAnalytics(userId, category) {
   const MINUTES_PER_DECISION = 8;
   await Analytics.findOneAndUpdate(
@@ -198,7 +177,6 @@ async function updateAnalytics(userId, category) {
   });
 }
 
-// ─── Helper: Update Recent Choices in Preferences ─────────────────────────────
 async function updateRecentChoices(preferences, category, chosen, context) {
   if (!preferences) return;
   const entry = {

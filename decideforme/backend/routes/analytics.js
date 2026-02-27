@@ -1,6 +1,4 @@
-/**
- * Analytics Routes
- */
+
 const express = require('express');
 const router = express.Router();
 const Analytics = require('../models/Analytics');
@@ -11,14 +9,12 @@ router.get('/', authenticate, async (req, res, next) => {
   try {
     const analytics = await Analytics.findOne({ user: req.user._id });
 
-    // Get recent 7-day activity for sparkline
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const recentDecisions = await Decision.find({
       user: req.user._id,
       createdAt: { $gte: sevenDaysAgo }
     }).select('createdAt category').lean();
 
-    // Group by day
     const dailyActivity = {};
     recentDecisions.forEach(d => {
       const day = d.createdAt.toISOString().split('T')[0];

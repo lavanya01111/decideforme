@@ -1,6 +1,3 @@
-/**
- * Layout - App shell with sidebar
- */
 
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
@@ -118,7 +115,6 @@ export default function Layout({ theme, setTheme }) {
   )
 }
 
-// ─── SVG Icons ────────────────────────────────────────────────────────────────
 function HomeIcon({ className }) {
   return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 21V12h6v9"/></svg>
 }

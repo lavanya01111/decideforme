@@ -1,10 +1,3 @@
-/**
- * Group Vote Routes
- * POST /api/groups          - Create group vote
- * GET  /api/groups/:token   - Get vote by share token (public)
- * POST /api/groups/:token/vote - Cast a vote
- * PUT  /api/groups/:id/close  - Close voting + get AI winner
- */
 
 const express = require('express');
 const router = express.Router();
@@ -12,7 +5,6 @@ const crypto = require('crypto');
 const GroupVote = require('../models/GroupVote');
 const { authenticate } = require('../middleware/auth');
 
-// Create group vote
 router.post('/', authenticate, async (req, res, next) => {
   try {
     const { title, category, options, expiresAt } = req.body;
@@ -24,7 +16,7 @@ router.post('/', authenticate, async (req, res, next) => {
       category,
       options: options.map(text => ({ text, votes: [], voteCount: 0 })),
       shareToken,
-      expiresAt: expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000) // 24hr default
+      expiresAt: expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000) 
     });
 
     const shareUrl = `${process.env.CLIENT_URL}/vote/${shareToken}`;
@@ -32,7 +24,6 @@ router.post('/', authenticate, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// Get vote by token (public - no auth needed)
 router.get('/token/:token', async (req, res, next) => {
   try {
     const group = await GroupVote.findOne({ shareToken: req.params.token })
@@ -42,7 +33,6 @@ router.get('/token/:token', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// Cast vote (simple - by name, no auth required)
 router.post('/token/:token/vote', async (req, res, next) => {
   try {
     const { optionText, voterName } = req.body;
@@ -62,13 +52,11 @@ router.post('/token/:token/vote', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// Close voting
 router.put('/:id/close', authenticate, async (req, res, next) => {
   try {
     const group = await GroupVote.findOne({ _id: req.params.id, creator: req.user._id });
     if (!group) return res.status(404).json({ error: 'Group not found.' });
 
-    // Find winner by votes
     const winner = group.options.sort((a, b) => b.voteCount - a.voteCount)[0];
     group.winner = winner.text;
     group.status = 'decided';

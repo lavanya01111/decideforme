@@ -1,7 +1,4 @@
-/**
- * NewDecision Page
- * The main AI decision-making interface
- */
+
 
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -30,7 +27,6 @@ export default function NewDecision() {
     }
   })
 
-  // Timer state
   const [timerActive, setTimerActive] = useState(false)
   const [timerSeconds, setTimerSeconds] = useState(30)
   const [timeLeft, setTimeLeft] = useState(30)
@@ -40,12 +36,11 @@ export default function NewDecision() {
     if (searchParams.get('category')) setStep(1)
   }, [])
 
-  // Timer logic
   useEffect(() => {
     if (timerActive && timeLeft > 0) {
       timerRef.current = setTimeout(() => setTimeLeft(t => t - 1), 1000)
     } else if (timerActive && timeLeft === 0) {
-      handleSubmit(true) // auto-decide
+      handleSubmit(true) 
     }
     return () => clearTimeout(timerRef.current)
   }, [timerActive, timeLeft])

@@ -1,7 +1,3 @@
-/**
- * GroupVote Model
- * For collaborative group decision making
- */
 
 const mongoose = require('mongoose');
 
@@ -22,14 +18,14 @@ const groupVoteSchema = new mongoose.Schema({
     votes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     voteCount: { type: Number, default: 0 }
   }],
-  // Participants: email invites or user IDs
+  
   participants: [{
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     email: String,
     hasVoted: { type: Boolean, default: false },
     votedFor: String
   }],
-  // Shareable link token
+  
   shareToken: {
     type: String,
     unique: true,

@@ -1,7 +1,4 @@
-/**
- * Dashboard Page
- * Shows stats, recent decisions, quick action
- */
+
 
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'

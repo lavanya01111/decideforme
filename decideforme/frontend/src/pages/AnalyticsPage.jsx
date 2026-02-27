@@ -1,7 +1,3 @@
-/**
- * Analytics Page
- * Time saved, habits, category breakdown
- */
 
 import { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
@@ -18,7 +14,6 @@ export default function AnalyticsPage() {
   useEffect(() => {
     api.get('/analytics').then(r => {
       setData(r.data.analytics)
-      // Convert daily activity to chart format
       const entries = Object.entries(r.data.dailyActivity || {})
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([date, count]) => ({
@@ -38,7 +33,6 @@ export default function AnalyticsPage() {
     </div>
   )
 
-  // Build category pie data
   const pieData = data?.byCategory
     ? Object.entries(data.byCategory)
         .filter(([, v]) => v.count > 0)

@@ -87,19 +87,16 @@
   }
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 99px; }
 .dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
 
-/* Animation delays for stagger */
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
 .delay-400 { animation-delay: 400ms; }
 
-/* Option item hover */
 .option-item {
   @apply relative overflow-hidden cursor-pointer border-2 border-zinc-200 dark:border-zinc-700
          rounded-xl p-4 transition-all duration-200 hover:border-primary-400 hover:bg-primary-50

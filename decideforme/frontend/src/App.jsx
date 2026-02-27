@@ -1,13 +1,10 @@
-/**
- * App.jsx - Root component with routing
- */
+
 
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import useAuthStore from './context/authStore'
 import { getInitialTheme, applyTheme } from './utils/theme'
 
-// Pages
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -18,7 +15,6 @@ import AnalyticsPage from './pages/AnalyticsPage'
 import Settings from './pages/Settings'
 import Layout from './components/Layout'
 
-// Protected route wrapper
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuthStore()
   if (isLoading) return <LoadingScreen />

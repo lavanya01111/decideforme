@@ -1,7 +1,4 @@
-/**
- * Settings Page
- * Profile, preferences, AI learning settings
- */
+
 
 import { useState, useEffect } from 'react'
 import useAuthStore from '../context/authStore'

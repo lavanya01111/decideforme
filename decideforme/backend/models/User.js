@@ -1,7 +1,4 @@
-/**
- * User Model
- * Stores user account data and profile
- */
+
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
@@ -26,7 +23,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required'],
     minlength: 6,
-    select: false // Never return password in queries
+    select: false 
   },
   avatar: {
     type: String,
@@ -41,21 +38,21 @@ const userSchema = new mongoose.Schema({
     enum: ['light', 'dark', 'system'],
     default: 'system'
   },
-  // Quick profile data for AI context
+
   profile: {
     age: Number,
-    dietaryRestrictions: [String], // ['vegetarian', 'gluten-free', etc.]
-    fitnessGoal: String,           // 'lose weight', 'maintain', 'gain muscle'
-    workStyle: String,             // 'focused', 'flexible', 'deadline-driven'
+    dietaryRestrictions: [String], 
+    fitnessGoal: String,           
+    workStyle: String,             
     budget: {
-      food: String,     // 'low', 'medium', 'high'
+      food: String,     
       entertainment: String,
       general: String
     }
   },
   stats: {
     totalDecisions: { type: Number, default: 0 },
-    minutesSaved: { type: Number, default: 0 },  // Each decision = ~8 min saved
+    minutesSaved: { type: Number, default: 0 },  
     currentStreak: { type: Number, default: 0 },
     lastActive: { type: Date, default: Date.now }
   },
@@ -64,19 +61,16 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Hash password before saving
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
-// Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Remove sensitive fields from JSON output
 userSchema.methods.toJSON = function() {
   const obj = this.toObject();
   delete obj.password;

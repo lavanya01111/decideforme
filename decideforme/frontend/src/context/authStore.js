@@ -1,7 +1,3 @@
-/**
- * Auth Store (Zustand)
- * Global state for user authentication
- */
 
 import { create } from 'zustand'
 import api from '../utils/api'
@@ -12,7 +8,6 @@ const useAuthStore = create((set, get) => ({
   isLoading: true,
   isAuthenticated: false,
 
-  // Initialize auth from stored token
   init: async () => {
     const token = localStorage.getItem('dfm_token')
     if (!token) {

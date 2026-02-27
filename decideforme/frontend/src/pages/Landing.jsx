@@ -1,7 +1,4 @@
-/**
- * Landing Page
- * Marketing page with hero, features, CTA
- */
+
 
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
