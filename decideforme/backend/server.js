@@ -29,8 +29,19 @@ const app = express();
 
 // ─── Security Middleware ──────────────────────────────────────────────────────
 app.use(helmet());
+
+const allowedOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || 'http://localhost:5173')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // allow non-browser clients (curl/postman) with no Origin header
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(null, false);
+  },
   credentials: true
 }));
 

@@ -4,8 +4,20 @@
 
 import axios from 'axios'
 
+function normalizeBaseURL(input) {
+  if (!input) return null
+  let url = String(input).trim()
+  if (!url) return null
+  url = url.replace(/\/+$/, '')
+  // Allow either ".../api" or just backend root.
+  if (!/\/api$/.test(url)) url = `${url}/api`
+  return url
+}
+
 const api = axios.create({
-  baseURL: '/api',
+  // Dev uses Vite proxy (/api). Production should set VITE_API_URL=https://<render-host>
+  // This normalizes to "<render-host>/api".
+  baseURL: normalizeBaseURL(import.meta.env.VITE_API_URL) || '/api',
   headers: { 'Content-Type': 'application/json' }
 })
 
