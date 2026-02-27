@@ -13,6 +13,13 @@ export default function Login() {
   const login = useAuthStore(s => s.login)
   const navigate = useNavigate()
 
+  const getErrorMessage = (err) => {
+    const apiMessage = err?.response?.data?.error || err?.response?.data?.message
+    if (apiMessage) return apiMessage
+    if (err?.request) return 'Network/CORS error. Check VITE_API_URL and Render CORS settings.'
+    return err?.message || 'Login failed. Please try again.'
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -21,7 +28,7 @@ export default function Login() {
       await login(form.email, form.password)
       navigate('/app')
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed. Please try again.')
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false)
     }

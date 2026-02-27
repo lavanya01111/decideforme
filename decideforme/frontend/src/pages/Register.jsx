@@ -14,6 +14,13 @@ export default function Register() {
   const register = useAuthStore(s => s.register)
   const navigate = useNavigate()
 
+  const getErrorMessage = (err) => {
+    const apiMessage = err?.response?.data?.error || err?.response?.data?.message
+    if (apiMessage) return apiMessage
+    if (err?.request) return 'Network/CORS error. Check VITE_API_URL and Render CORS settings.'
+    return err?.message || 'Registration failed. Please try again.'
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -25,7 +32,7 @@ export default function Register() {
       await register(form.name, form.email, form.password)
       navigate('/app')
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed. Please try again.')
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false)
     }
