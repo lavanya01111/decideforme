@@ -39,8 +39,26 @@ app.use(cors({
   origin: (origin, callback) => {
     // allow non-browser clients (curl/postman) with no Origin header
     if (!origin) return callback(null, true);
+    // Explicit allow-list (exact matches)
     if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(null, false);
+
+    // Allow common local dev origins
+    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      return callback(null, true);
+    }
+
+    // Allow Vercel deployments (prod + preview): https://*.vercel.app
+    try {
+      const { hostname, protocol } = new URL(origin);
+      if ((protocol === 'https:' || protocol === 'http:') && hostname.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
+    } catch {
+      // ignore parsing errors and fall through
+    }
+
+    // Reject anything else
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
   },
   credentials: true
 }));
