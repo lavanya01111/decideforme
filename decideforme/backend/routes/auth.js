@@ -24,10 +24,18 @@ const signToken = (userId) => {
 
 // ─── Register ────────────────────────────────────────────────────────────────
 router.post('/register', [
-  body('name').trim().isLength({ min: 2, max: 50 }),
-  body('email').isEmail().normalizeEmail(),
-  body('password').isLength({ min: 6 })
-], async (req, res) => {
+  body('name')
+    .trim()
+    .isLength({ min: 2, max: 50 })
+    .withMessage('Name must be between 2 and 50 characters.'),
+  body('email')
+    .isEmail()
+    .withMessage('Please provide a valid email address.')
+    .normalizeEmail(),
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters.')
+], async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -57,6 +65,10 @@ router.post('/register', [
       user
     });
   } catch (err) {
+    // Handle duplicate key (email uniqueness)
+    if (err && (err.code === 11000 || err.code === 11001)) {
+      return res.status(409).json({ error: 'Email already registered.' });
+    }
     next(err);
   }
 });
